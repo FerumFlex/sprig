@@ -76,7 +76,7 @@ class Sprig_Field_Image extends Sprig_Field_Char {
 
 		if ($value)
 		{
-			$input .= HTML::image($this->verbose($value));
+			$input .= '<br />'.HTML::image($this->verbose($value));
 		}
 
 		return $input;
