@@ -11,33 +11,6 @@
 class Sprig_Field_Image extends Sprig_Field_Char {
 
 	/**
-	 * @const string Image will be cropped to the passed size (via Image->crop);
-	 */
-	const RESIZE_TYPE_CROP = 'RESIZE_TYPE_CROP';
-
-	/**
-	 * @const string Image will be resized to fit in the passed size (via Image->resize);
-	 */
-	const RESIZE_TYPE_FIT = 'RESIZE_TYPE_FIT';
-
-	/**
-	 * @const string Image will be resized and cropped to fit exactly in the passed size
-	 * while retaining as much of the image as possible (via Image->resizeAndCrop);
-	 */
-	const RESIZE_TYPE_EXACT_FIT = 'RESIZE_TYPE_EXACT_FIT';
-
-	/**
-	 * @const string Image will not be cropped or resized at all and an Exception will
-	 * be thrown if the uploaded image isn't the correct size.
-	 */
-	const RESIZE_TYPE_EXACT = 'RESIZE_TYPE_EXACT';
-
-	/**
-	 * @const string Image will not be cropped or resized at all
-	 */
-	const RESIZE_TYPE_NONE = 'RESIZE_TYPE_NONE';
-
-	/**
 	 * @var  integer  image width
 	 */
 	public $width;
@@ -48,43 +21,36 @@ class Sprig_Field_Image extends Sprig_Field_Char {
 	public $height;
 
 	/**
-	 * @var  string  path where the image will be saved to/ loaded from
+	 * @var  string  directory where the image will be loaded from
 	 */
-	public $path;
+	public $directory;
 
 	/**
-	 * @var  string one of the RESIZE_TYPE_* constants
+	 * @var  integer  one of the Image resize constants
 	 */
-	public $resize_type;
+	public $resize = Image::AUTO;
 
 	public function __construct(array $options = NULL)
 	{
-		if (empty($options['path']) OR ! (is_dir($options['path']) OR mkdir($options['path'], 0777, TRUE)))
+		if (empty($options['directory']) OR ! is_dir($options['directory']))
 		{
-			throw new Sprig_Exception('Image fields must have a directory path to save and load images from');
+			throw new Sprig_Exception('Image fields must define a directory path');
 		}
 
-		parent::__construct($options);
+		// Normalize the directory path
+		$options['directory'] = rtrim(str_replace(array('\\', '/'), '/', $options['directory']), '/').'/';
 
-		// Make sure the path has a trailing slash
-		$this->path = rtrim(str_replace('\\', '/', $this->path), '/').'/';
+		parent::__construct($options);
 	}
 
 	public function input($name, $value, array $attr = NULL)
 	{
-		$input = Form::file($name, $attr);
-
-		if ($value)
-		{
-			$input .= '<br />'.HTML::image($this->verbose($value));
-		}
-
-		return $input;
+		return Form::file($name, $attr);
 	}
 
 	public function verbose($value)
 	{
-		return $this->path.$value;
+		return $this->directory.$value;
 	}
 
 } // End Sprig_Field_Image

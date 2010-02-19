@@ -9,10 +9,12 @@ class Sprig_Field_BelongsTo extends Sprig_Field_ForeignKey {
 		$model = Sprig::factory($this->model);
 
 		$choices = $model->select_list($model->pk());
-		
+
 		if ($this->empty)
-			$choices = arr::merge(array(NULL => '----'), $choices);
-		
+		{
+			Arr::unshift($choices, '', '-- '.__('None'));
+		}
+
 		return Form::select($name, $choices, $this->verbose($value), $attr);
 	}
 
