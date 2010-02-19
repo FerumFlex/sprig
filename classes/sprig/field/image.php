@@ -59,7 +59,7 @@ class Sprig_Field_Image extends Sprig_Field_Char {
 
 	public function __construct(array $options = NULL)
 	{
-		if (empty($options['path']) OR ! is_dir($options['path']))
+		if (empty($options['path']) OR ! (is_dir($options['path']) OR mkdir($options['path'], 0777, TRUE)))
 		{
 			throw new Sprig_Exception('Image fields must have a directory path to save and load images from');
 		}
