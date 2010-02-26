@@ -1093,58 +1093,6 @@ abstract class Sprig_Core {
 		{
 			$result = $query
 				->execute($this->_db);
-
-/*			if (count($result))
-			{
-				// Set the loaded status before setting values to prevent an
-				// infinate loop with lazy loading in __get()
-				$this->state('loaded');
-				
-				// Get the values from the result
-				$values = $result->current();
-				
-				// $this->values($values);
-				$related = array();
-				
-				foreach ($values as $name => $value)
-				{
-					if (array_key_exists($name, $this->_fields))
-					{
-						// Set the original value
-						$this->_original[$name] = $this->_fields[$name]->value($value);
-						
-						if ($this->changed($name))
-						{
-							// Remove stale changed values
-							unset($this->_changed[$name]);
-						}
-					} else {
-						// These will be from 'with'
-						list($l_field, $f_field) = explode(':', $name, 2);
-						$related[$l_field][$f_field] = $value;
-					}
-				}
-				
-				foreach ($related as $l_field => $f_data) {
-					
-					$model = null;
-					if (array_key_exists($l_field, $this->_related))
-						$model = $this->_related[$l_field];
-					else
-						$model = Sprig::factory($this->_fields[$l_field]->model);
-					
-					foreach ($f_data as $name => $value) {
-						$model->_original[$name] = $model->_fields[$name]->value($value);
-					
-						// Remove stale changed values
-						if ($model->changed($name))
-							unset($model->_changed[$name]);
-					}
-					
-					$model->state('loaded');
-					$this->_related[$l_field] = $model;
-				}
-			}*/
 			
 			if (count($result))
 			{
@@ -1484,5 +1432,10 @@ abstract class Sprig_Core {
 	 * @return  void
 	 */
 	abstract protected function _init();
+	
+	public function original($field)
+	{
+		return arr::get($this->_original, $field, NULL);
+	}
 
 } // End Sprig
