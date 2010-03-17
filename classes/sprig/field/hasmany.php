@@ -34,7 +34,7 @@ class Sprig_Field_HasMany extends Sprig_Field_ForeignKey {
 			$value = (array) $value;
 		}
 
-		if ($value)
+		/*if ($value)
 		{
 			// Combine the value to make a mirrored array
 			$value = array_combine($value, $value);
@@ -44,7 +44,7 @@ class Sprig_Field_HasMany extends Sprig_Field_ForeignKey {
 				// Convert the value to the proper type
 				$value[$id] = parent::value($id);
 			}
-		}
+		}*/
 
 		return $value;
 	}
