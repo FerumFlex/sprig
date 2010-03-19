@@ -54,7 +54,12 @@ class Sprig_Field_Image extends Sprig_Field_Char {
 	public function input($name, $value, array $attr = NULL)
 	{
 		$delete = $name.'_delete';
-		$text = Form::file($name, $attr);
+		
+		$text = '';
+		if ($value)
+			$text .= Html::image($this->verbose($value)).'<br />';
+		
+		$text .= Form::file($name, $attr);
 		if ($value)
 			$text .= '<br />'.Form::checkbox($delete, '1', FALSE, array('id'=>$delete)).Form::label($delete, 'Удалить');
 		
