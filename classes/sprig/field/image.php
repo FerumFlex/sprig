@@ -53,7 +53,12 @@ class Sprig_Field_Image extends Sprig_Field_Char {
 
 	public function input($name, $value, array $attr = NULL)
 	{
-		return Form::file($name, $attr);
+		$delete = $name.'_delete';
+		$text = Form::file($name, $attr);
+		if ($value)
+			$text .= '<br />'.Form::checkbox($delete, '1', FALSE, array('id'=>$delete)).Form::label($delete, 'Удалить');
+		
+		return $text;
 	}
 
 	public function verbose($value)
@@ -71,15 +76,23 @@ class Sprig_Field_Image extends Sprig_Field_Char {
 
 		// Get the image from the array
 		$image = $array[$input];
-
+		
 		if ( ! Upload::valid($image) OR ! Upload::not_empty($image))
 		{
+			if (isset($_POST[$this->column.'_delete']))
+			{
+				$this->delete();
+				$array[$input] = '';
+			} else
+				unset($array[$input]);
 			// No need to do anything right now
 			return;
 		}
 
 		if (Upload::valid($image) AND  Upload::type($image, $this->types))
 		{
+			$this->delete();
+			
 			$filename = strtolower(Text::random('alnum', 20)).'.jpg';
 
 			if ($file = Upload::save($image, NULL, $this->directory))
@@ -104,5 +117,15 @@ class Sprig_Field_Image extends Sprig_Field_Char {
 			$array->error('image', 'valid');
 		}
 	}
-
+	
+	public function delete()
+	{
+		$old = $this->object->original($this->column);
+		if ($old)
+		{
+			$old = $this->verbose($old);
+			if (file_exists($old))
+				unlink($old);
+		}
+	}
 } // End Sprig_Field_Image
