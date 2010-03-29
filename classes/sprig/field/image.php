@@ -46,6 +46,11 @@ class Sprig_Field_Image extends Sprig_Field_Char {
 	 * @var string show this image on empty
 	*/
 	public $empty_image;
+
+	/*
+	 * tmp dir
+	*/
+	public $tmp_dir = 'upload/tmp';
 	
 	public function __construct(array $options = NULL)
 	{
@@ -59,6 +64,10 @@ class Sprig_Field_Image extends Sprig_Field_Char {
 
 		parent::__construct($options);
 
+		if (empty($this->tmp_dir) OR ! (is_dir($this->tmp_dir) OR mkdir($this->tmp_dir, 0777, TRUE)))
+		{
+			throw new Sprig_Exception('Image fields must define a tmp directory');
+		}
 		// Handle uploads
 		$this->callbacks[] = array($this, '_upload_image');
 	}
@@ -109,8 +118,8 @@ class Sprig_Field_Image extends Sprig_Field_Char {
 		if (Upload::valid($image) AND  Upload::type($image, $this->types))
 		{
 			$this->delete($this->object->original($input));
-			
-			if ($file = Upload::save($image, NULL, sys_get_temp_dir()))
+
+			if ($file = Upload::save($image, NULL, $this->tmp_dir))
 			{
 				$filename = $this->rand($file);
 				
