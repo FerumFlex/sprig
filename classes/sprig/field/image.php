@@ -34,7 +34,24 @@ class Sprig_Field_Image extends Sprig_Field_Char {
 	 * @var  array   types of images to accept
 	 */
 	public $types = array('jpg', 'jpeg', 'png', 'gif');
+	
+	/**
+	 * @var  func   function for upload images
+	*/
+	public $save_image = array(
+		'func' => 'Sprig_Copy::copy',
+	);
+	
+	/*
+	 * @var string show this image on empty
+	*/
+	public $empty_image;
 
+	/*
+	 * tmp dir
+	*/
+	public $tmp_dir = 'upload/tmp';
+	
 	public function __construct(array $options = NULL)
 	{
 		if (empty($options['directory']) OR ! (is_dir($options['directory']) OR mkdir($options['directory'], 0777, TRUE)))
@@ -47,6 +64,10 @@ class Sprig_Field_Image extends Sprig_Field_Char {
 
 		parent::__construct($options);
 
+		if (empty($this->tmp_dir) OR ! (is_dir($this->tmp_dir) OR mkdir($this->tmp_dir, 0777, TRUE)))
+		{
+			throw new Sprig_Exception('Image fields must define a tmp directory');
+		}
 		// Handle uploads
 		$this->callbacks[] = array($this, '_upload_image');
 	}
@@ -68,7 +89,7 @@ class Sprig_Field_Image extends Sprig_Field_Char {
 
 	public function verbose($value)
 	{
-		return $this->directory.$value;
+		return ($value ? $this->directory.$value : $this->empty_image);
 	}
 
 	public function _upload_image(Validate $array, $input)
@@ -96,19 +117,15 @@ class Sprig_Field_Image extends Sprig_Field_Char {
 
 		if (Upload::valid($image) AND  Upload::type($image, $this->types))
 		{
-			$this->delete();
-			
-			$filename = strtolower(Text::random('alnum', 20)).'.jpg';
+			$this->delete($this->object->original($input));
 
-			if ($file = Upload::save($image, NULL, $this->directory))
+			if ($file = Upload::save($image, NULL, $this->tmp_dir))
 			{
-				Image::factory($file)
-					->resize($this->width, $this->height, $this->resize)
-					->save($this->directory.$filename);
-
-				// Update the image filename
-				$array[$input] = $filename;
-
+				$filename = $this->rand($file);
+				
+				$params = arr::get($this->save_image, 'params', array());
+				$array[$input] = call_user_func($this->save_image['func'], $file, $this->directory, $filename, $params);
+				
 				// Delete the temporary file
 				unlink($file);
 			}
@@ -123,14 +140,18 @@ class Sprig_Field_Image extends Sprig_Field_Char {
 		}
 	}
 	
-	public function delete()
+	public function delete($value)
 	{
-		$old = $this->object->original($this->column);
-		if ($old)
+		if ($value)
 		{
-			$old = $this->verbose($old);
-			if (file_exists($old))
-				unlink($old);
+			$file = $this->verbose($value);
+			if (file_exists($file))
+				unlink($file);
 		}
+	}
+
+	public function rand($file)
+	{
+		return (string)time().Text::random('alnum', 20).'.'.pathinfo($file, PATHINFO_EXTENSION);
 	}
 } // End Sprig_Field_Image
