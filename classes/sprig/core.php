@@ -807,7 +807,9 @@ abstract class Sprig_Core {
 			{
 				case 'new':
 					// Reset original data
-					$this->_original = Sprig::factory($this->_model)->as_array();
+					foreach ($this->_fields as $name=>$field)
+						$this->_original[$name] = $field->value($field->default);
+					$this->_changed  = array();
 				break;
 				case 'loaded':
 					// Merge the changed data into the original data
