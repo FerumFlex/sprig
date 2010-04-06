@@ -29,4 +29,16 @@ class Sprig_Copy {
 		
 		return $dest;
 	}
+	
+	public static function resize($src, $dir, $dest, $params)
+	{
+		$width = arr::get($params, 'width', '');
+		$height = arr::get($params, 'height', '');
+		$master = arr::get($params, 'master', Image::AUTO);
+		$image = Image::factory($src);
+		
+		$image->resize($width, $height, $master)->save($dir.$dest);
+		
+		return $dest;
+	}
 }
