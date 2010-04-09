@@ -107,7 +107,7 @@ class Sprig_Field_Image extends Sprig_Field_Char {
 		{
 			if (isset($_POST[$this->column.'_delete']))
 			{
-				$this->delete();
+				$this->delete($this->object->original($input));
 				$array[$input] = '';
 			} else
 				unset($array[$input]);
