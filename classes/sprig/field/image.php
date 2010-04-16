@@ -77,11 +77,11 @@ class Sprig_Field_Image extends Sprig_Field_Char {
 		$delete = $name.'_delete';
 		
 		$text = '';
-		if ($value)
+		if ($value AND ! is_array($value))
 			$text .= Html::image($this->verbose($value)).'<br />';
 		
 		$text .= Form::file($name, $attr);
-		if ($value)
+		if ($value AND $this->empty == TRUE)
 			$text .= '<br />'.Form::checkbox($delete, '1', FALSE, array('id'=>$delete)).Form::label($delete, 'Удалить');
 		
 		return $text;
@@ -107,7 +107,7 @@ class Sprig_Field_Image extends Sprig_Field_Char {
 		{
 			if (isset($_POST[$this->column.'_delete']))
 			{
-				$this->delete();
+				$this->delete($this->object->original($input));
 				$array[$input] = '';
 			} else
 				unset($array[$input]);
