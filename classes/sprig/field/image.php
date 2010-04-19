@@ -77,8 +77,13 @@ class Sprig_Field_Image extends Sprig_Field_Char {
 		$delete = $name.'_delete';
 		
 		$text = '';
-		if ($value AND ! is_array($value))
-			$text .= Html::image($this->verbose($value)).'<br />';
+		if ($value)
+		{
+			if (! is_array($value))
+				$text .= Html::image($this->verbose($value)).'<br />';
+			elseif ($this->object->original($this->column))
+				$text .= Html::image($this->verbose($this->object->original($this->column))).'<br />';
+		}
 		
 		$text .= Form::file($name, $attr);
 		if ($value AND $this->empty == TRUE)
