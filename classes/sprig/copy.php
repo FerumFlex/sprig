@@ -37,7 +37,10 @@ class Sprig_Copy {
 		$master = arr::get($params, 'master', Image::AUTO);
 		$image = Image::factory($src);
 		
-		$image->resize($width, $height, $master)->save($dir.$dest);
+		if (($width < $image->width) OR ($height < $image->height))
+			$image->resize($width, $height, $master);
+		
+		$image->save($dir.$dest);
 		
 		return $dest;
 	}
