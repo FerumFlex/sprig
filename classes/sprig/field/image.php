@@ -54,6 +54,9 @@ class Sprig_Field_Image extends Sprig_Field_Char {
 	
 	public function __construct(array $options = NULL)
 	{
+		if ( ! empty($options['directory']))
+			$options['directory'] = Kohana::config('upload.directory').$options['directory'];
+	
 		if (empty($options['directory']) OR ! (is_dir($options['directory']) OR mkdir($options['directory'], 0777, TRUE)))
 		{
 			throw new Sprig_Exception('Image fields must define a directory path');
