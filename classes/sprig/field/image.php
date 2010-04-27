@@ -50,27 +50,44 @@ class Sprig_Field_Image extends Sprig_Field_Char {
 	/*
 	 * tmp dir
 	*/
-	public $tmp_dir = 'upload/tmp';
+	public $tmp_dir = NULL;
+	
+	/*
+	 * base dir for uploads
+	*/
+	public $base_dir = NULL;
+	
+	public $url = NULL;
 	
 	public function __construct(array $options = NULL)
 	{
-		if ( ! empty($options['directory']))
-			$options['directory'] = Kohana::config('upload.directory').$options['directory'];
-	
-		if (empty($options['directory']) OR ! (is_dir($options['directory']) OR mkdir($options['directory'], 0777, TRUE)))
+		if (empty($options['base_dir']))
+			$options['base_dir'] = Kohana::config('upload.directory');
+		
+		if (empty($options['tmp_dir']))
+			$options['tmp_dir'] = Kohana::config('upload.tmp');
+		
+		if (empty($options['url']))
+			$options['url'] = Kohana::config('upload.url');
+		
+		// Normalize the directory path
+		$options['base_dir'] = rtrim(str_replace(array('\\', '/'), '/', $options['base_dir']), '/').'/';
+		$options['tmp_dir'] = rtrim(str_replace(array('\\', '/'), '/', $options['tmp_dir']), '/').'/';
+		
+		$options['directory'] = rtrim(str_replace(array('\\', '/'), '/', $options['directory']), '/').'/';
+
+		if ( ! (is_dir($options['base_dir'].$options['directory']) OR mkdir($options['base_dir'].$options['directory'], 0777, TRUE)))
 		{
 			throw new Sprig_Exception('Image fields must define a directory path');
 		}
 
-		// Normalize the directory path
-		$options['directory'] = rtrim(str_replace(array('\\', '/'), '/', $options['directory']), '/').'/';
-
-		parent::__construct($options);
-
-		if (empty($this->tmp_dir) OR ! (is_dir($this->tmp_dir) OR mkdir($this->tmp_dir, 0777, TRUE)))
+		if ( ! (is_dir($options['base_dir'].$options['tmp_dir']) OR mkdir($options['base_dir'].$options['tmp_dir'], 0777, TRUE)))
 		{
 			throw new Sprig_Exception('Image fields must define a tmp directory');
 		}
+		
+		parent::__construct($options);
+
 		// Handle uploads
 		$this->callbacks[] = array($this, '_check_empty');
 		$this->callbacks[] = array($this, '_upload_image');
@@ -98,7 +115,7 @@ class Sprig_Field_Image extends Sprig_Field_Char {
 
 	public function verbose($value)
 	{
-		return ($value ? $this->directory.$value : $this->empty_image);
+		return ($value ? $this->url.$this->directory.$value : $this->empty_image);
 	}
 	
 	public function _check_empty(Validate $array, $input)
@@ -135,17 +152,17 @@ class Sprig_Field_Image extends Sprig_Field_Char {
 			// No need to do anything right now
 			return;
 		}
-
+		
 		if (Upload::valid($image) AND  Upload::type($image, $this->types))
 		{
 			$this->delete($this->object->original($input));
 
-			if ($file = Upload::save($image, NULL, $this->tmp_dir))
+			if ($file = Upload::save($image, NULL, $this->base_dir.$this->tmp_dir))
 			{
 				$filename = $this->rand($file);
 				
 				$params = arr::get($this->save_image, 'params', array());
-				$array[$input] = call_user_func($this->save_image['func'], $file, $this->directory, $filename, $params);
+				$array[$input] = call_user_func($this->save_image['func'], $file, $this->base_dir.$this->directory, $filename, $params);
 				
 				// Delete the temporary file
 				unlink($file);
@@ -165,7 +182,7 @@ class Sprig_Field_Image extends Sprig_Field_Char {
 	{
 		if ($value)
 		{
-			$file = $this->verbose($value);
+			$file = $this->base_dir.$this->directory.$value;
 			if (file_exists($file))
 				unlink($file);
 		}

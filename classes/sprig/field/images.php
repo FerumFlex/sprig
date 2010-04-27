@@ -38,16 +38,13 @@ class Sprig_Field_Images extends Sprig_Field_Image {
 		{
 			$this->delete($this->object->original($input));
 			
-			if ( ! is_dir($this->directory))
-				mkdir($this->directory, 0777, TRUE);
-			
-			if ($tmp_file = Upload::save($image, NULL, sys_get_temp_dir()))
+			if ($tmp_file = Upload::save($image, NULL, $this->base_dir.$this->tmp_dir))
 			{
 				$files = array();
 				foreach ($this->images as $type=>$data)
 				{
 					$params = arr::get($data, 'params', array());
-					$file = call_user_func($data['func'], $tmp_file, $this->directory, $this->rand($tmp_file), $params);
+					$file = call_user_func($data['func'], $tmp_file, $this->base_dir.$this->directory, $this->rand($tmp_file), $params);
 					if (empty($file))
 					{
 						$array->error('image', 'failed');
@@ -77,7 +74,7 @@ class Sprig_Field_Images extends Sprig_Field_Image {
 	public function verbose($value, $type = 'default')
 	{
 		$value = $this->to_array($value);
-		return (isset($value[$type]) ? $this->directory.$value[$type] : $this->empty_image);
+		return (isset($value[$type]) ? $this->url.$this->directory.$value[$type] : $this->empty_image);
 	}
 	
 	public function to_array($value)
@@ -96,7 +93,7 @@ class Sprig_Field_Images extends Sprig_Field_Image {
 		{
 			foreach ($value as $type=>$default)
 			{
-				$file = $this->directory.$default;
+				$file = $this->base_dir.$this->directory.$default;
 				if (file_exists($file))
 					unlink($file);
 			}

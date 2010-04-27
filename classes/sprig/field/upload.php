@@ -15,21 +15,33 @@ class Sprig_Field_Upload extends Sprig_Field_Char {
 	 */
 	public $types = array('jpg', 'jpeg', 'png', 'gif');
 	
+	/*
+	 * base dir for uploads
+	*/
+	public $base_dir = NULL;
+	
+	public $url = NULL;
+	
 	public function __construct(array $options = NULL)
 	{
-		if ( ! empty($options['path']))
-			$options['path'] = Kohana::config('upload.directory').$options['path'];
+		if (empty($options['base_dir']))
+			$options['base_dir'] = Kohana::config('upload.directory');
 		
-		if (empty($options['path']) OR ! (is_dir($options['path']) OR mkdir($options['path'], 0777, TRUE)))
+		if (empty($options['url']))
+			$options['url'] = Kohana::config('upload.url');
+		
+		// Normalize the directory path
+		$options['base_dir'] = rtrim(str_replace(array('\\', '/'), '/', $options['base_dir']), '/').'/';
+		
+		$options['path'] = rtrim(str_replace(array('\\', '/'), '/', $options['path']), '/').'/';
+
+		if ( ! (is_dir($options['base_dir'].$options['path']) OR mkdir($options['base_dir'].$options['path'], 0777, TRUE)))
 		{
-			throw new Sprig_Exception('File fields must have a directory path to save and load files from');
+			throw new Sprig_Exception('Upload fields must define a directory path');
 		}
 
 		parent::__construct($options);
 
-		// Make sure the path has a trailing slash
-		$this->path = rtrim(str_replace('\\', '/', $this->path), '/').'/';
-		
 		// Handle uploads
 		$this->callbacks[] = array($this, '_check_empty');
 		$this->callbacks[] = array($this, '_upload');
@@ -53,7 +65,7 @@ class Sprig_Field_Upload extends Sprig_Field_Char {
 
 	public function verbose($value)
 	{
-		return $this->path.$value;
+		return $this->url.$this->path.$value;
 	}
 
 	public function _check_empty(Validate $array, $input)
@@ -95,7 +107,7 @@ class Sprig_Field_Upload extends Sprig_Field_Char {
 		{
 			$this->delete($this->object->original($input));
 			
-			$array[$input] = basename(Upload::save($file, NULL, $this->path));
+			$array[$input] = basename(Upload::save($file, NULL, $this->base_dir.$this->path));
 			
 		}
 		else
@@ -108,7 +120,7 @@ class Sprig_Field_Upload extends Sprig_Field_Char {
 	{
 		if ($value)
 		{
-			$file = $this->verbose($value);
+			$file = $this->base_dir.$this->path.$value;
 			if (file_exists($file))
 				unlink($file);
 		}

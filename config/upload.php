@@ -4,5 +4,7 @@
  * @author		Anton <anton@altsolution.net>
  */
 return array(
-	'directory' => '',
+	'directory' => 'upload/',
+	'url' => 'upload/',
+	'tmp' => 'tmp/'
 );
