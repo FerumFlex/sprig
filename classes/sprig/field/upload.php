@@ -28,6 +28,7 @@ class Sprig_Field_Upload extends Sprig_Field_Char {
 		$this->path = rtrim(str_replace('\\', '/', $this->path), '/').'/';
 		
 		// Handle uploads
+		$this->callbacks[] = array($this, '_check_empty');
 		$this->callbacks[] = array($this, '_upload');
 	}
 
@@ -52,6 +53,18 @@ class Sprig_Field_Upload extends Sprig_Field_Char {
 		return $this->path.$value;
 	}
 
+	public function _check_empty(Validate $array, $input)
+	{
+		// Get the file from the array
+		$file = $array[$input];
+		
+		if ( ! $this->empty AND ! $this->object->loaded())
+		{
+			if ( ! Upload::valid($file) OR ! Upload::not_empty($file))
+				$array->error($input, 'not_empty');
+		}
+	}
+	
 	public function _upload(Validate $array, $input)
 	{
 		if ($array->errors())
@@ -80,6 +93,7 @@ class Sprig_Field_Upload extends Sprig_Field_Char {
 			$this->delete($this->object->original($input));
 			
 			$array[$input] = basename(Upload::save($file, NULL, $this->path));
+			
 		}
 		else
 		{

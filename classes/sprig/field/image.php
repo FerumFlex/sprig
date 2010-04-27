@@ -69,6 +69,7 @@ class Sprig_Field_Image extends Sprig_Field_Char {
 			throw new Sprig_Exception('Image fields must define a tmp directory');
 		}
 		// Handle uploads
+		$this->callbacks[] = array($this, '_check_empty');
 		$this->callbacks[] = array($this, '_upload_image');
 	}
 
@@ -95,6 +96,18 @@ class Sprig_Field_Image extends Sprig_Field_Char {
 	public function verbose($value)
 	{
 		return ($value ? $this->directory.$value : $this->empty_image);
+	}
+	
+	public function _check_empty(Validate $array, $input)
+	{
+		// Get the file from the array
+		$file = $array[$input];
+		
+		if ( ! $this->empty AND ! $this->object->loaded())
+		{
+			if ( ! Upload::valid($file) OR ! Upload::not_empty($file))
+				$array->error($input, 'not_empty');
+		}
 	}
 
 	public function _upload_image(Validate $array, $input)
@@ -136,12 +149,12 @@ class Sprig_Field_Image extends Sprig_Field_Char {
 			}
 			else
 			{
-				$array->error('image', 'failed');
+				$array->error($input, 'failed');
 			}
 		}
 		else
 		{
-			$array->error('image', 'valid');
+			$array->error($input, 'valid');
 		}
 	}
 	
