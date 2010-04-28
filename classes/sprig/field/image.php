@@ -182,10 +182,15 @@ class Sprig_Field_Image extends Sprig_Field_Char {
 	{
 		if ($value)
 		{
-			$file = $this->base_dir.$this->directory.$value;
+			$file = $this->file($value);
 			if (file_exists($file))
 				unlink($file);
 		}
+	}
+	
+	public function file($value)
+	{
+		return $this->base_dir.$this->directory.$value;
 	}
 
 	public function rand($file)

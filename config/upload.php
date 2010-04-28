@@ -5,6 +5,6 @@
  */
 return array(
 	'directory' => 'upload/',
-	'url' => 'upload/',
+	'url' => url::site().'upload/',
 	'tmp' => 'tmp/'
 );
