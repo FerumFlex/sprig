@@ -44,7 +44,10 @@ class Sprig_Field_Images extends Sprig_Field_Image {
 				foreach ($this->images as $type=>$data)
 				{
 					$params = arr::get($data, 'params', array());
-					$file = call_user_func($data['func'], $tmp_file, $this->base_dir.$this->directory, $this->rand($tmp_file), $params);
+					$dir = $this->base_dir.$this->directory;
+					
+					is_dir($dir) OR mkdir($dir);
+					$file = call_user_func($data['func'], $tmp_file, $dir, $this->rand($tmp_file), $params);
 					if (empty($file))
 					{
 						$array->error('image', 'failed');
