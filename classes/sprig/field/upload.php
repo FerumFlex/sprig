@@ -103,12 +103,16 @@ class Sprig_Field_Upload extends Sprig_Field_Char {
 			return;
 		}
 
-		if (Upload::valid($file) AND  Upload::type($file, $this->types))
+		if (Upload::valid($file))
 		{
-			$this->delete($this->object->original($input));
-			
-			$array[$input] = basename(Upload::save($file, NULL, $this->base_dir.$this->path));
-			
+			if ($this->types AND ! Upload::type($file, $this->types))
+			{
+				$array->error('file', 'valid');
+			} else {
+				$this->delete($this->object->original($input));
+				
+				$array[$input] = basename(Upload::save($file, NULL, $this->base_dir.$this->path));
+			}
 		}
 		else
 		{
