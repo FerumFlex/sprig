@@ -111,7 +111,10 @@ class Sprig_Field_Upload extends Sprig_Field_Char {
 			} else {
 				$this->delete($this->object->original($input));
 				
-				$array[$input] = basename(Upload::save($file, NULL, $this->base_dir.$this->path));
+				$dir = $this->base_dir.$this->path;
+				is_dir($dir) OR mkdir($dir);
+				
+				$array[$input] = basename(Upload::save($file, NULL, $dir));
 			}
 		}
 		else
@@ -124,9 +127,14 @@ class Sprig_Field_Upload extends Sprig_Field_Char {
 	{
 		if ($value)
 		{
-			$file = $this->base_dir.$this->path.$value;
+			$file = $this->file($value);
 			if (file_exists($file))
 				unlink($file);
 		}
+	}
+	
+	public function file($value)
+	{
+		return $this->base_dir.$this->path.$value;
 	}
 }

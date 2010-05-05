@@ -161,8 +161,11 @@ class Sprig_Field_Image extends Sprig_Field_Char {
 			{
 				$filename = $this->rand($file);
 				
+				$dir = $this->base_dir.$this->directory;
+				is_dir($dir) OR mkdir($dir);
+				
 				$params = arr::get($this->save_image, 'params', array());
-				$array[$input] = call_user_func($this->save_image['func'], $file, $this->base_dir.$this->directory, $filename, $params);
+				$array[$input] = call_user_func($this->save_image['func'], $file, $dir, $filename, $params);
 				
 				// Delete the temporary file
 				unlink($file);
