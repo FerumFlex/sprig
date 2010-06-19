@@ -107,7 +107,7 @@ class Sprig_Field_Image extends Sprig_Field_Char {
 		}
 		
 		$text .= Form::file($name, $attr);
-		if ($value AND $this->empty == TRUE)
+		if ($this->object->original($this->column) AND $this->empty == TRUE)
 			$text .= '<br />'.Form::checkbox($delete, '1', FALSE, array('id'=>$delete)).Form::label($delete, 'Удалить');
 		
 		return $text;
