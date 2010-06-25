@@ -59,7 +59,7 @@ class Sprig_Field_Multienum extends Sprig_Field_Enum {
 		$inputs = array();
 		foreach ($this->choices as $key => $label)
 		{
-			$inputs[] = '<label>'.Form::checkbox("{$name}[]", $key, in_array($key, $value)).' '.$label.'</label>';
+			$inputs[] = '<label>'.Form::checkbox("{$name}[]", $key, in_array($key, (string)$value)).' '.$label.'</label>';
 		}
 
 		// Hidden input is added to force $_POST to contain a value for
