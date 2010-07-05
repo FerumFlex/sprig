@@ -16,7 +16,7 @@ class Sprig_Field_Multienum extends Sprig_Field_Enum {
 		$array = array();
 		if (is_array($value))
 		{
-			foreach ($value as $key=>$value)
+			foreach ($value as $key)
 			{
 				if (isset($this->choices[$key]))
 					$array[] = $this->choices[$key];
