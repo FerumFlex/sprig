@@ -6,5 +6,5 @@
 return array(
 	'directory' => DOCROOT.'upload/',
 	'url' => url::site().'upload/',
-	'tmp' => DOCROOT.'upload/tmp/'
+	'tmp' => 'tmp/'
 );
