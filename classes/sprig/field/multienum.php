@@ -56,6 +56,9 @@ class Sprig_Field_Multienum extends Sprig_Field_Enum {
 		if (is_string($value))
 			$value = unserialize($value);
 		
+		if ( ! is_array($value))
+			$value = array();
+		
 		$inputs = array();
 		foreach ($this->choices as $key => $label)
 		{
