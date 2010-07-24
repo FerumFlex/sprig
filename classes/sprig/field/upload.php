@@ -52,7 +52,7 @@ class Sprig_Field_Upload extends Sprig_Field_Char {
 		$delete = $name.'_delete';
 		
 		$text = Form::file($name, $attr);
-		if ($value)
+		if ($this->object->original($this->column))
 		{
 			if ( ! is_array($value))
 				$text.= '<br />'.HTML::anchor($this->verbose($value));
