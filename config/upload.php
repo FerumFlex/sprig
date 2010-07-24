@@ -4,7 +4,7 @@
  * @author		Anton <anton@altsolution.net>
  */
 return array(
-	'directory' => 'upload/',
+	'directory' => DOCROOT.'upload/',
 	'url' => url::site().'upload/',
 	'tmp' => 'tmp/'
 );

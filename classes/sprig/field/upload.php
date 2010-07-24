@@ -110,11 +110,11 @@ class Sprig_Field_Upload extends Sprig_Field_Char {
 				$array->error('file', 'valid');
 			} else {
 				$this->delete($this->object->original($input));
-				
+				$filename = uniqid().filter::filename(pathinfo($file['name'], PATHINFO_BASENAME));
 				$dir = $this->base_dir.$this->path;
 				is_dir($dir) OR mkdir($dir);
 				
-				$array[$input] = basename(Upload::save($file, NULL, $dir));
+				$array[$input] = basename(Upload::save($file, $filename, $this->base_dir.$this->path));
 			}
 		}
 		else

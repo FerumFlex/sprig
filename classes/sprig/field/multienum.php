@@ -16,7 +16,7 @@ class Sprig_Field_Multienum extends Sprig_Field_Enum {
 		$array = array();
 		if (is_array($value))
 		{
-			foreach ($value as $key=>$value)
+			foreach ($value as $key)
 			{
 				if (isset($this->choices[$key]))
 					$array[] = $this->choices[$key];
@@ -56,10 +56,13 @@ class Sprig_Field_Multienum extends Sprig_Field_Enum {
 		if (is_string($value))
 			$value = unserialize($value);
 		
+		if ( ! is_array($value))
+			$value = array();
+		
 		$inputs = array();
 		foreach ($this->choices as $key => $label)
 		{
-			$inputs[] = '<label>'.Form::checkbox("{$name}[]", $key, in_array($key, $value)).' '.$label.'</label>';
+			$inputs[] = '<label>'.Form::checkbox("{$name}[]", $key, in_array((string)$key, $value)).' '.$label.'</label>';
 		}
 
 		// Hidden input is added to force $_POST to contain a value for
