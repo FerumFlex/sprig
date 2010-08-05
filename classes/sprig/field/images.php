@@ -83,7 +83,7 @@ class Sprig_Field_Images extends Sprig_Field_Image {
 	public function to_array($value)
 	{
 		if (is_string($value))
-			$value = unserialize($value);
+			$value = @unserialize($value);
 		
 		return $value;
 	}
