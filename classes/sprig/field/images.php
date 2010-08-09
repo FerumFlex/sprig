@@ -88,18 +88,19 @@ class Sprig_Field_Images extends Sprig_Field_Image {
 		return $value;
 	}
 	
-	public function delete($value)
+	public function file($value, $type = 'default')
 	{
 		$value = $this->to_array($value);
-		
-		if (is_array($value))
+		return (isset($value[$type]) ?  $this->base_dir.$this->directory.$value[$type] : '');
+	}
+	
+	public function delete($value)
+	{
+		foreach ($this->images as $type=>$data)
 		{
-			foreach ($value as $type=>$default)
-			{
-				$file = $this->base_dir.$this->directory.$default;
-				if (file_exists($file))
-					unlink($file);
-			}
+			$file = $this->file($value, $type);
+			if ($file AND file_exists($file))
+				unlink($file);
 		}
 	}
 }
